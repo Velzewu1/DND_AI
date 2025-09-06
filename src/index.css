@@ -3,6 +3,35 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  
+  /* Green-Gold Dark Fantasy Palette */
+  --color-gold-primary: #d4af37;
+  --color-gold-light: #f4e4bc;
+  --color-gold-dark: #8b7355;
+  --color-gold-muted: #6b5d3f;
+  
+  --color-green-primary: #00ff41;
+  --color-green-dark: #00a028;
+  --color-green-muted: #2d5016;
+  --color-green-glow: #00ff4180;
+  
+  --color-black: #0a0a0a;
+  --color-dark: #1a1a1a;
+  --color-shadow: #000000cc;
+}
+
+/* Full-viewport layout and hidden scrollbar */
+html, body {
+  height: 100%;
+}
+
+/* Hide global scrollbar visuals but keep scroll */
+html {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none;   /* Firefox */
+}
+html::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 }
 
 body {
@@ -11,4 +40,311 @@ body {
   width: 100vw;
   overflow-x: hidden;
   background: #000;
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none;   /* Firefox */
+}
+
+body::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* Hide scrollbars inside the internal Parallax container */
+.parallax-viewport {
+  overflow: hidden;           /* no visual scrollbar */
+  -ms-overflow-style: none;   /* IE and Edge */
+  scrollbar-width: none;      /* Firefox */
+}
+.parallax-viewport::-webkit-scrollbar {
+  display: none;              /* Chrome, Safari, Opera */
+}
+
+/* CRT Scanlines effect - prominent green tint */
+.crt-lines::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 255, 65, 0.03) 2px,
+    rgba(0, 255, 65, 0.03) 3px
+  );
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.8;
+  mix-blend-mode: screen;
+}
+
+/* Additional CRT phosphor glow */
+.crt-lines::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 0%,
+    transparent 60%,
+    rgba(0, 255, 65, 0.02) 100%
+  );
+  pointer-events: none;
+  z-index: 9998;
+  animation: crt-flicker 4s infinite;
+}
+
+@keyframes crt-flicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.95; }
+}
+
+/* Video noise overlay container */
+.noise-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9998;
+  mix-blend-mode: overlay;
+  opacity: 0.05;
+}
+
+.noise-overlay video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Enhanced VHS static noise */
+.vhs-noise::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 255, 65, 0.01) 2px,
+      rgba(0, 255, 65, 0.01) 4px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(212, 175, 55, 0.01) 2px,
+      rgba(212, 175, 55, 0.01) 4px
+    );
+  pointer-events: none;
+  z-index: 9997;
+  opacity: 0.6;
+  animation: vhs-static 0.5s steps(10) infinite;
+}
+
+@keyframes vhs-static {
+  0%, 100% { transform: translate(0, 0); }
+  10% { transform: translate(-1px, -1px); }
+  20% { transform: translate(1px, 0); }
+  30% { transform: translate(0, 1px); }
+  40% { transform: translate(1px, -1px); }
+  50% { transform: translate(-1px, 1px); }
+}
+
+/* Dark fantasy title with gold */
+.fantasy-title {
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  color: var(--color-gold-primary);
+  text-shadow: 
+    0 0 20px var(--color-gold-dark),
+    0 2px 4px var(--color-shadow),
+    2px 2px 0 rgba(0, 0, 0, 0.8);
+  letter-spacing: 0.08em;
+}
+
+/* Green CRT glow for important text */
+.ancient-glow {
+  color: var(--color-gold-light);
+  text-shadow: 
+    0 0 30px var(--color-green-glow),
+    0 0 10px var(--color-gold-dark),
+    0 2px 4px var(--color-shadow);
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+@keyframes glow-pulse {
+  0%, 100% { 
+    text-shadow: 
+      0 0 30px var(--color-green-glow),
+      0 0 10px var(--color-gold-dark),
+      0 2px 4px var(--color-shadow);
+  }
+  50% { 
+    text-shadow: 
+      0 0 40px var(--color-green-glow),
+      0 0 15px var(--color-gold-dark),
+      0 2px 4px var(--color-shadow);
+  }
+}
+
+/* Gold accent text */
+.gold-accent {
+  color: var(--color-gold-primary);
+  text-shadow: 
+    0 0 10px var(--color-gold-dark),
+    0 2px 4px var(--color-shadow);
+}
+
+/* Secondary text with IM Fell */
+.stone-text {
+  font-family: 'IM Fell English', serif;
+  color: var(--color-gold-muted);
+  text-shadow: 
+    1px 1px 0 rgba(0, 0, 0, 0.8),
+    0 0 5px rgba(0, 255, 65, 0.1);
+  letter-spacing: 0.02em;
+}
+
+/* Dark vignette with green tint */
+.dark-vignette::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(
+      ellipse at center,
+      transparent 0%,
+      transparent 30%,
+      rgba(0, 0, 0, 0.7) 100%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.3) 0%,
+      transparent 20%,
+      transparent 80%,
+      rgba(0, 0, 0, 0.5) 100%
+    );
+  pointer-events: none;
+  z-index: 9996;
+}
+
+/* Dark grading overlay */
+.dark-grading {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.4) 0%,
+    rgba(0, 40, 0, 0.2) 50%,
+    rgba(0, 0, 0, 0.5) 100%
+  );
+  pointer-events: none;
+  z-index: 9995;
+  mix-blend-mode: multiply;
+}
+
+/* Parchment texture overlay */
+.parchment-overlay {
+  background-image: 
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 10px,
+      rgba(244, 241, 232, 0.01) 10px,
+      rgba(244, 241, 232, 0.01) 20px
+    );
+}
+
+/* Green terminal text */
+.terminal-text {
+  font-family: 'Courier New', monospace;
+  color: var(--color-green-primary);
+  text-shadow: 
+    0 0 5px var(--color-green-glow),
+    0 1px 2px var(--color-shadow);
+  letter-spacing: 0.05em;
+}
+
+/* Dark fantasy button with green-gold */
+.fantasy-button {
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-gold-primary);
+  background: linear-gradient(180deg, 
+    rgba(10, 10, 10, 0.95) 0%, 
+    rgba(0, 0, 0, 0.95) 100%);
+  border: 1px solid var(--color-gold-dark);
+  box-shadow: 
+    inset 0 1px 0 rgba(212, 175, 55, 0.1),
+    0 2px 4px var(--color-shadow),
+    0 0 10px rgba(0, 255, 65, 0.05);
+  transition: all 0.3s;
+}
+
+.fantasy-button:hover {
+  color: var(--color-gold-light);
+  border-color: var(--color-green-primary);
+  box-shadow: 
+    inset 0 1px 0 rgba(0, 255, 65, 0.1),
+    0 2px 8px var(--color-shadow),
+    0 0 20px var(--color-green-glow);
+  transform: translateY(-1px);
+}
+
+/* Engraved border with gold-green */
+.engraved-border {
+  border: 2px solid;
+  border-image: linear-gradient(
+    135deg,
+    var(--color-gold-dark) 0%,
+    var(--color-green-dark) 50%,
+    var(--color-gold-dark) 100%
+  ) 1;
+  box-shadow: 
+    inset 0 2px 4px var(--color-shadow),
+    0 1px 0 rgba(212, 175, 55, 0.1),
+    0 0 15px rgba(0, 255, 65, 0.02);
+}
+
+/* VHS chromatic aberration */
+.vhs-text {
+  position: relative;
+  animation: vhs-shift 3s infinite;
+}
+
+@keyframes vhs-shift {
+  0%, 100% {
+    text-shadow: 
+      -0.025em 0 0 rgba(255, 0, 0, 0.3),
+      0.025em 0 0 rgba(0, 255, 255, 0.3),
+      0 0 10px var(--color-green-glow);
+  }
+  50% {
+    text-shadow: 
+      -0.05em 0 0 rgba(255, 0, 0, 0.4),
+      0.05em 0 0 rgba(0, 255, 255, 0.4),
+      0 0 15px var(--color-green-glow);
+  }
 }

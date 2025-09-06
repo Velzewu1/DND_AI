@@ -1,1 +1,59 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&family=IM+Fell+English:ital@0;1&display=swap');
+
 @import "tailwindcss";
+
+/* Retro-fantasy palette (early 00s / late 90s vibe) */
+:root {
+  --retro-ink: #0b0d12;
+  --retro-surface: #131720;
+  --retro-border: rgba(255, 245, 225, 0.08);
+  --retro-amber: #d8b26f;
+  --retro-teal: #7ea6a6;
+  --crt-green: #9AFc65;
+}
+
+/* Titles use classic serif vibe */
+.retro-title {
+  font-family: Georgia, "Times New Roman", serif;
+  letter-spacing: 0.06em;
+}
+
+/* Subtle glows */
+.retro-amber { color: var(--retro-amber); text-shadow: 0 0 2px rgba(216,178,111,.5), 0 0 6px rgba(216,178,111,.22); }
+.retro-teal { color: var(--retro-teal); text-shadow: 0 0 2px rgba(126,166,166,.45), 0 0 6px rgba(126,166,166,.2); }
+
+/* CRT green text */
+.crt-text { color: var(--crt-green); text-shadow: 0 0 2px rgba(154,252,101,.55), 0 0 6px rgba(154,252,101,.25); }
+
+/* Minimal glass bar */
+.glass-dark {
+  backdrop-filter: blur(6px);
+  background: linear-gradient(rgba(13,16,24,.55), rgba(13,16,24,.35));
+  border-bottom: 1px solid var(--retro-border);
+}
+
+/* Light scanlines + vignette */
+.scanlines::before {
+  content: ""; position: fixed; inset: 0; pointer-events: none;
+  background: repeating-linear-gradient(to bottom, rgba(154,252,101,.05), rgba(154,252,101,.05) 1px, rgba(0,0,0,0) 3px, rgba(0,0,0,0) 4px);
+  mix-blend-mode: overlay; opacity: .18; z-index: 5;
+}
+.vignette::after {
+  content: ""; position: fixed; inset: 0; pointer-events: none;
+  background: radial-gradient(ellipse at center, rgba(0,0,0,0) 55%, rgba(0,0,0,.45) 100%); z-index: 6;
+}
+
+/* Subtle green grid for early-UI feel */
+.crt-grid::before {
+  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 4; opacity: .08;
+  background-image:
+    linear-gradient(rgba(154,252,101,.2) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(154,252,101,.2) 1px, transparent 1px);
+  background-size: 32px 32px, 32px 32px;
+}
+
+/* Terminal-like links */
+.terminal-link { color: var(--crt-green); text-decoration: none; }
+.terminal-link::before { content: "> "; opacity: .7; }
+.terminal-link:hover { text-decoration: underline; }
