@@ -10,13 +10,22 @@ function Story() {
 		focus: "exploration",
 		npcDensity: "medium"
 	})
+	const [isGenerating, setIsGenerating] = useState(false)
 
 	const handleInputChange = (field, value) => {
 		setConfig(prev => ({ ...prev, [field]: value }))
 	}
 
-	const generateStory = () => {
+	const generateStory = async () => {
+		if (!config.setting.trim()) return
+		
+		setIsGenerating(true)
 		console.log("Story Configuration:", config)
+		
+		// Simulate API call
+		await new Promise(resolve => setTimeout(resolve, 2000))
+		
+		setIsGenerating(false)
 		alert(`Story generated with setting: "${config.setting}"`)
 	}
 
@@ -178,14 +187,14 @@ function Story() {
 								</div>
 								<button
 									onClick={generateStory}
-									disabled={!config.setting.trim()}
+									disabled={!config.setting.trim() || isGenerating}
 									className={`w-full px-3 py-2 border font-mono text-xs uppercase tracking-wider transition-all ${
-										!config.setting.trim() 
+										!config.setting.trim() || isGenerating
 											? 'border-red-500/50 text-red-400 bg-red-500/10 cursor-not-allowed' 
-											: 'border-green-500 text-green-100 bg-green-500/20 hover:bg-green-500/30 hover:shadow-md hover:shadow-green-500/30 vhs-text'
-									}`}
+											: 'border-green-500 text-green-100 bg-green-500/20 hover:bg-green-500/30 hover:shadow-md hover:shadow-green-500/30 vhs-text hover:scale-105'
+									} ${isGenerating ? 'loading' : ''}`}
 								>
-									{!config.setting.trim() ? '⚠ BLOCKED' : '⚡ EXECUTE'}
+									{isGenerating ? '⚡ GENERATING...' : !config.setting.trim() ? '⚠ BLOCKED' : '⚡ EXECUTE'}
 								</button>
 							</div>
 						</div>

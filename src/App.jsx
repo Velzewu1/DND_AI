@@ -58,6 +58,14 @@ function App() {
 
 	return (
 		<main className="bg-black text-white w-screen overflow-x-hidden crt-lines vhs-noise dark-vignette">
+			{/* Scroll Progress Indicator */}
+			<div className="fixed top-0 left-0 right-0 z-[1001] h-1 bg-black/50">
+				<div 
+					className="h-full bg-gradient-to-r from-green-500 via-green-400 to-gold-500 transition-all duration-100 ease-out"
+					style={{ width: `${Math.min((scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100, 100)}%` }}
+				/>
+			</div>
+
 			{/* Dark grading overlay */}
 			<div className="dark-grading" aria-hidden="true" />
 			

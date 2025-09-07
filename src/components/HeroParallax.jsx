@@ -48,7 +48,7 @@ function HeroParallax({ scrollY = 0, heroHeight = 0, infoHeight = 0, tCover = 0 
 	}, [tHero, endY, scrollY, heroHeight, infoHeight, logoApi])
 
 	return (
-		<div className="fixed inset-0 z-10 pointer-events-none overflow-hidden bg-black">
+		<div id="hero" className="fixed inset-0 z-10 pointer-events-none overflow-hidden bg-black">
 			<img src={backgroundImg} alt="bg" className="absolute inset-0 z-0 w-full h-full object-cover object-center" />
 			<img src={castleImg} alt="castle" className="absolute inset-0 z-10 w-full h-full object-cover object-bottom" />
 			<img src={frontFogImg} alt="fog" className="absolute inset-0 z-30 w-full h-full object-cover opacity-80" />

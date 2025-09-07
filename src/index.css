@@ -25,6 +25,38 @@ html, body {
   height: 100%;
 }
 
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Enhanced focus states for accessibility */
+*:focus {
+  outline: 2px solid var(--color-green-primary);
+  outline-offset: 2px;
+}
+
+/* Improved button hover states */
+button, input, select {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Loading animation */
+@keyframes pulse-glow {
+  0%, 100% { 
+    box-shadow: 0 0 5px currentColor;
+    opacity: 1;
+  }
+  50% { 
+    box-shadow: 0 0 20px currentColor;
+    opacity: 0.8;
+  }
+}
+
+.loading {
+  animation: pulse-glow 1.5s ease-in-out infinite;
+}
+
 /* Hide global scrollbar visuals but keep scroll */
 html {
   -ms-overflow-style: none; /* IE and Edge */
@@ -194,6 +226,42 @@ body::-webkit-scrollbar {
     2px 2px 0 rgba(0, 0, 0, 0.9);
   animation: glow-pulse 3s ease-in-out infinite;
   filter: drop-shadow(0 0 30px rgba(0, 255, 65, 0.2));
+}
+
+/* Improved readability for form elements */
+input:focus, select:focus, textarea:focus {
+  box-shadow: 
+    0 0 0 2px var(--color-green-primary),
+    0 0 20px var(--color-green-glow);
+  border-color: var(--color-green-primary);
+  transform: scale(1.02);
+}
+
+/* Enhanced button interactions */
+button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* Improved visual hierarchy */
+.section-title {
+  position: relative;
+  display: inline-block;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--color-green-primary), transparent);
+  opacity: 0.6;
 }
 
 @keyframes glow-pulse {
