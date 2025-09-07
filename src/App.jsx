@@ -61,6 +61,10 @@ function App() {
 			{/* Dark grading overlay */}
 			<div className="dark-grading" aria-hidden="true" />
 			
+			{/* Enhanced atmospheric overlays */}
+			<div className="atmospheric-overlay" aria-hidden="true" />
+			<div className="edge-vignette" aria-hidden="true" />
+			
 			{/* Video noise overlay - add video element here later */}
 			<div className="noise-overlay" aria-hidden="true">
 				{/* <video autoPlay loop muted playsInline>
@@ -81,13 +85,12 @@ function App() {
 			
 			{/* Underground section with 3 full-screen parts */}
 			<div 
-				className="relative w-screen min-h-[300vh] z-[90] pt-20"
+				className="relative w-screen h-[300vh] z-[50]"
 				style={{
 					backgroundImage: `url(${undergroundBg})`,
 					backgroundSize: 'cover',
-					backgroundPosition: 'center center',
-					backgroundRepeat: 'no-repeat',
-					backgroundAttachment: 'local'
+					backgroundPosition: 'center',
+					backgroundRepeat: 'no-repeat'
 				}}
 			>
 				{/* Story Section - 1/3 */}
