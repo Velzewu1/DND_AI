@@ -1,11 +1,11 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import './App.css'
-import NavBar from './components/NavBar.jsx'
-import HeroParallax from './components/HeroParallax.jsx'
-import Information from './sections/Information.jsx'
-import Story from './sections/Story.jsx'
-import Characters from './sections/Characters.jsx'
-import Map from './sections/Map.jsx'
+import NavBar from '../back/app/components/NavBar.jsx'
+import HeroParallax from '../back/app/components/HeroParallax.jsx'
+import Information from '../back/app/sections/Information.jsx'
+import Story from '../back/app/sections/Story.jsx'
+import Characters from '../back/app/sections/Characters.jsx'
+import Map from '../back/app/sections/Map.jsx'
 import undergroundBg from './assets/underground_background.jpg'
 
 function clamp(value, min, max) {
