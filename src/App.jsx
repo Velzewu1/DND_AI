@@ -6,7 +6,7 @@ import Information from './sections/Information.jsx'
 import Story from './sections/Story.jsx'
 import Characters from './sections/Characters.jsx'
 import Map from './sections/Map.jsx'
-import undergroundBg from './assets/underground_background.jpg'
+// Using public path for underground background
 
 function clamp(value, min, max) {
 	return Math.min(Math.max(value, min), max)
@@ -95,7 +95,7 @@ function App() {
 			<div 
 				className="relative w-screen h-[300vh] z-[50]"
 				style={{
-					backgroundImage: `url(${undergroundBg})`,
+					backgroundImage: `url(/underground_background.jpg)`,
 					backgroundSize: 'cover',
 					backgroundPosition: 'center',
 					backgroundRepeat: 'no-repeat'

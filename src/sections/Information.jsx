@@ -1,14 +1,16 @@
-import React from 'react'
-import bottomRocks from '../assets/BottomRocks.png'
+'use client'
 
-function Information() {
+import React, { forwardRef } from 'react'
+
+const Information = forwardRef((props, ref) => {
 	return (
 		<section
+			ref={ref}
 			id="information"
 			className="relative z-[100] w-screen flex items-center justify-center text-white"
 			style={{
 				aspectRatio: '2560 / 2880', // Correct aspect ratio for BottomRocks
-				backgroundImage: `url(${bottomRocks})`,
+				backgroundImage: `url(/BottomRocks.png)`,
 				backgroundSize: 'cover',
 				backgroundPosition: 'center top',
 				backgroundRepeat: 'no-repeat',
@@ -78,8 +80,8 @@ function Information() {
 			</div>
 		</section>
 	)
-}
+})
+
+Information.displayName = 'Information'
 
 export default Information
-
-

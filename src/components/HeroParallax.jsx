@@ -1,12 +1,8 @@
+'use client'
+
 import React, { useEffect, useMemo, useRef } from 'react'
 import { Parallax, ParallaxLayer } from '@react-spring/parallax'
 import { useSpring, animated as a } from '@react-spring/web'
-
-import backgroundImg from '../assets/dark_fantasy_background.jpg'
-import moonImg from '../assets/moon.png'
-import castleImg from '../assets/castle.png'
-import rocksImg from '../assets/rocks.png'
-import frontFogImg from '../assets/front fog.png'
 
 function clamp(value, min, max) {
 	return Math.min(Math.max(value, min), max)
@@ -49,22 +45,22 @@ function HeroParallax({ scrollY = 0, heroHeight = 0, infoHeight = 0, tCover = 0 
 
 	return (
 		<div id="hero" className="fixed inset-0 z-10 pointer-events-none overflow-hidden bg-black">
-			<img src={backgroundImg} alt="bg" className="absolute inset-0 z-0 w-full h-full object-cover object-center" />
-			<img src={castleImg} alt="castle" className="absolute inset-0 z-10 w-full h-full object-cover object-bottom" />
-			<img src={frontFogImg} alt="fog" className="absolute inset-0 z-30 w-full h-full object-cover opacity-80" />
+			<img src="/dark_fantasy_background.jpg" alt="bg" className="absolute inset-0 z-0 w-full h-full object-cover object-center" />
+			<img src="/castle.png" alt="castle" className="absolute inset-0 z-10 w-full h-full object-cover object-bottom" />
+			<img src="/front fog.png" alt="fog" className="absolute inset-0 z-30 w-full h-full object-cover opacity-80" />
 
 			<div className="absolute inset-0 z-[35] bg-black" style={{ opacity: tCover * 0.6 }} />
 
 			<Parallax ref={backParallaxRef} pages={cfg.pages} className="parallax-viewport absolute inset-0 z-5 h-full w-full" style={{ pointerEvents: 'none', background: 'transparent' }}>
 				<ParallaxLayer offset={0} speed={cfg.speeds.moon * speedScale} style={{ zIndex: 1, pointerEvents: 'none', background: 'transparent' }}>
-					<img src={moonImg} alt="moon" className="absolute inset-0 w-full h-full object-contain object-[70%_20%] opacity-90" />
+					<img src="/moon.png" alt="moon" className="absolute inset-0 w-full h-full object-contain object-[70%_20%] opacity-90" />
 				</ParallaxLayer>
 			</Parallax>
 
 			<Parallax ref={frontParallaxRef} pages={cfg.pages} className="parallax-viewport absolute inset-0 z-20 h-full w-full" style={{ pointerEvents: 'none', background: 'transparent' }}>
 				<ParallaxLayer offset={0} speed={cfg.speeds.rocks * speedScale} style={{ zIndex: 1, pointerEvents: 'none', background: 'transparent' }}>
 					<img
-						src={rocksImg}
+						src="/rocks.png"
 						alt="rocks"
 						className="absolute inset-x-0 bottom-0 w-full h-auto object-contain object-bottom"
 						style={{ transform: `translateY(${cfg.rocksStartVH}vh)` }}
@@ -87,5 +83,3 @@ function HeroParallax({ scrollY = 0, heroHeight = 0, infoHeight = 0, tCover = 0 
 }
 
 export default HeroParallax
-
-

@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState } from 'react'
 
 function Story() {
@@ -11,6 +13,8 @@ function Story() {
 		npcDensity: "medium"
 	})
 	const [isGenerating, setIsGenerating] = useState(false)
+	const [generatedStory, setGeneratedStory] = useState("")
+	const [error, setError] = useState("")
 
 	const handleInputChange = (field, value) => {
 		setConfig(prev => ({ ...prev, [field]: value }))
@@ -20,13 +24,44 @@ function Story() {
 		if (!config.setting.trim()) return
 		
 		setIsGenerating(true)
-		console.log("Story Configuration:", config)
+		setError("")
+		setGeneratedStory("")
 		
-		// Simulate API call
-		await new Promise(resolve => setTimeout(resolve, 2000))
-		
-		setIsGenerating(false)
-		alert(`Story generated with setting: "${config.setting}"`)
+		try {
+			console.log("Story Configuration:", config)
+			
+			// Call our local API server
+			const response = await fetch('http://localhost:3001/api/generate-dnd-prompt', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					promptType: 'story',
+					config: {
+						setting: config.setting,
+						tone: config.tone,
+						complexity: config.complexity,
+						partySize: 4, // Default party size
+						level: 5 // Default level
+					}
+				})
+			})
+
+			const data = await response.json()
+			
+			if (data.success) {
+				setGeneratedStory(data.content)
+				console.log("Generated story:", data.content)
+			} else {
+				setError(data.error || 'Failed to generate story')
+			}
+		} catch (err) {
+			console.error('Error generating story:', err)
+			setError('Network error. Please try again.')
+		} finally {
+			setIsGenerating(false)
+		}
 	}
 
 	return (
@@ -174,6 +209,41 @@ function Story() {
 						</div>
 					</div>
 				</div>
+
+				{/* Generated Story Display */}
+				{(generatedStory || error) && (
+					<div className="mt-6 bg-black/90 border border-green-500/40 shadow-lg shadow-green-500/10 rounded">
+						{/* Header */}
+						<div className="bg-green-500/10 border-b border-green-500/30 px-4 py-3 flex items-center justify-between">
+							<div className="fantasy-title text-lg text-gold-primary ancient-glow">
+								Generated Chronicle
+							</div>
+							<button
+								onClick={() => {
+									setGeneratedStory("")
+									setError("")
+								}}
+								className="text-green-400 hover:text-red-400 transition-colors text-sm"
+							>
+								✕ Close
+							</button>
+						</div>
+
+						{/* Content */}
+						<div className="p-6">
+							{error ? (
+								<div className="text-red-400 font-mono text-sm bg-red-500/10 border border-red-500/30 p-4 rounded">
+									<div className="text-red-300 mb-2">ERROR:</div>
+									{error}
+								</div>
+							) : (
+								<div className="text-green-200 font-serif leading-relaxed whitespace-pre-wrap">
+									{generatedStory}
+								</div>
+							)}
+						</div>
+					</div>
+				)}
 			</div>
 		</section>
 	)
