@@ -1,34 +1,143 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
+import { Noise } from 'noisejs'
 
 function Map() {
 	const [mapConfig, setMapConfig] = useState({
 		size: "medium",
 		genre: "dark fantasy",
 		style: "dungeon",
-		seed: Math.floor(Math.random() * 999999)
+		seed: Math.floor(Math.random() * 999999),
+		terrainType: "archipelago"
 	})
+
+	const [isGenerating, setIsGenerating] = useState(false)
+	const [generatedMap, setGeneratedMap] = useState(null)
 
 	const handleConfigChange = (field, value) => {
 		setMapConfig(prev => ({ ...prev, [field]: value }))
+		// Clear generated map when config changes
+		if (generatedMap) {
+			setGeneratedMap(null)
+		}
+	}
+
+	// Create noise instance with seed
+	const createNoiseInstance = (seed) => {
+		return new Noise(seed)
+	}
+
+	const generateNoiseMap = () => {
+		console.log('Starting map generation...')
+		setIsGenerating(true)
+		setGeneratedMap(null) // Clear previous map
+		
+		try {
+			// Create noise instance with seed
+			const noiseInstance = createNoiseInstance(mapConfig.seed)
+			
+			// Map size configuration
+			const sizeConfig = {
+				small: { width: 32, height: 32, scale: 0.1 },
+				medium: { width: 64, height: 64, scale: 0.08 },
+				large: { width: 128, height: 128, scale: 0.06 },
+				massive: { width: 256, height: 256, scale: 0.04 }
+			}
+			
+			const config = sizeConfig[mapConfig.size]
+			const map = []
+			
+			console.log(`Generating ${mapConfig.terrainType} map: ${config.width}x${config.height} with seed: ${mapConfig.seed}`)
+			
+			// Generate noise based on terrain type
+			for (let y = 0; y < config.height; y++) {
+				const row = []
+				for (let x = 0; x < config.width; x++) {
+					let noiseValue = 0
+					
+					// Different noise patterns for different terrain types
+					switch (mapConfig.terrainType) {
+						case "archipelago":
+							// Multiple small islands with layered Perlin noise
+							noiseValue = noiseInstance.perlin2(x * config.scale, y * config.scale) * 0.5 + 
+										noiseInstance.perlin2(x * config.scale * 2, y * config.scale * 2) * 0.3 +
+										noiseInstance.perlin2(x * config.scale * 4, y * config.scale * 4) * 0.2
+							break
+						case "continent":
+							// Single large landmass with smooth Perlin noise
+							noiseValue = noiseInstance.perlin2(x * config.scale * 0.3, y * config.scale * 0.3) * 0.8 +
+										noiseInstance.perlin2(x * config.scale, y * config.scale) * 0.2
+							break
+						case "2 continents":
+							// Two separate landmasses using distance-based noise
+							const center1X = config.width * 0.3
+							const center1Y = config.height * 0.3
+							const center2X = config.width * 0.7
+							const center2Y = config.height * 0.7
+							
+							const dist1 = Math.sqrt((x - center1X) ** 2 + (y - center1Y) ** 2)
+							const dist2 = Math.sqrt((x - center2X) ** 2 + (y - center2Y) ** 2)
+							
+							const continent1 = noiseInstance.perlin2(x * config.scale * 0.4, y * config.scale * 0.4) - (dist1 / config.width) * 0.5
+							const continent2 = noiseInstance.perlin2(x * config.scale * 0.4, y * config.scale * 0.4) - (dist2 / config.width) * 0.5
+							
+							noiseValue = Math.max(continent1, continent2) * 0.7 + 
+										noiseInstance.perlin2(x * config.scale, y * config.scale) * 0.3
+							break
+					}
+					
+					// Normalize and classify terrain
+					let terrainType = 'water'
+					if (noiseValue > 0.1) terrainType = 'coast'
+					if (noiseValue > 0.3) terrainType = 'land'
+					if (noiseValue > 0.6) terrainType = 'mountain'
+					if (noiseValue > 0.8) terrainType = 'peak'
+					
+					row.push({
+						value: noiseValue,
+						type: terrainType,
+						x, y
+					})
+				}
+				map.push(row)
+			}
+			
+			console.log('Map generated successfully:', map.length, 'rows')
+			console.log('First few cells:', map[0]?.slice(0, 3))
+			
+			// Set the generated map
+			setGeneratedMap(map)
+			setIsGenerating(false)
+			console.log('Map state updated')
+			
+		} catch (error) {
+			console.error('Error generating map:', error)
+			setIsGenerating(false)
+		}
 	}
 
 	const randomizeMap = () => {
 		const sizes = ["small", "medium", "large", "massive"]
 		const styles = ["dungeon", "overworld", "city", "wilderness", "underground", "planar"]
+		const terrainTypes = ["archipelago", "continent", "2 continents"]
 		
 		setMapConfig(prev => ({
 			...prev,
 			size: sizes[Math.floor(Math.random() * sizes.length)],
 			style: styles[Math.floor(Math.random() * styles.length)],
+			terrainType: terrainTypes[Math.floor(Math.random() * terrainTypes.length)],
 			seed: Math.floor(Math.random() * 999999)
 		}))
 	}
 
 	const downloadMap = () => {
-		console.log("Downloading map:", mapConfig)
-		alert(`Generating ${mapConfig.size} ${mapConfig.style} map...`)
+		if (generatedMap) {
+			console.log("Downloading map:", mapConfig, generatedMap)
+			alert(`Downloading ${mapConfig.size} ${mapConfig.terrainType} map...`)
+		} else {
+			alert("Generate a map first!")
+		}
 	}
 
 	return (
@@ -67,29 +176,61 @@ function Map() {
 										</button>
 									))}
 								</div>
-								<select
-									value={mapConfig.genre}
-									onChange={(e) => handleConfigChange('genre', e.target.value)}
-									className="w-full bg-black/80 border border-green-500/40 text-green-200 px-3 py-2 font-serif text-sm focus:border-gold-500 focus:outline-none rounded mb-2"
-								>
-									<option value="dark fantasy">Dark Fantasy</option>
-									<option value="horror">Horror</option>
-									<option value="gothic">Gothic</option>
-									<option value="lovecraftian">Lovecraftian</option>
-									<option value="cyberpunk">Cyberpunk</option>
-								</select>
-								<select
-									value={mapConfig.style}
-									onChange={(e) => handleConfigChange('style', e.target.value)}
-									className="w-full bg-black/80 border border-green-500/40 text-green-200 px-3 py-2 font-serif text-sm focus:border-gold-500 focus:outline-none rounded"
-								>
-									<option value="dungeon">Dungeon</option>
-									<option value="overworld">Overworld</option>
-									<option value="city">City</option>
-									<option value="wilderness">Wilderness</option>
-									<option value="underground">Underground</option>
-									<option value="planar">Planar</option>
-								</select>
+								<div className="terminal-text text-xs text-green-400 mb-1">TERRAIN TYPE</div>
+								<div className="grid grid-cols-1 gap-1 mb-2">
+									{['archipelago', 'continent', '2 continents'].map(terrain => (
+										<button
+											key={terrain}
+											onClick={() => handleConfigChange('terrainType', terrain)}
+											className={`px-2 py-1 border font-mono text-xs transition-all uppercase ${
+												mapConfig.terrainType === terrain
+													? 'bg-green-500/30 border-green-400 text-green-100'
+													: 'bg-black/60 border-green-500/30 text-green-300 hover:border-green-400'
+											}`}
+										>
+											{terrain}
+										</button>
+									))}
+								</div>
+								<div className="relative mb-2">
+									<select
+										value={mapConfig.genre}
+										onChange={(e) => handleConfigChange('genre', e.target.value)}
+										className="w-full bg-black/80 border border-green-500/40 text-green-200 px-3 py-2 font-mono text-xs focus:border-gold-500 focus:outline-none rounded appearance-none cursor-pointer hover:border-green-400 transition-all"
+										style={{
+											backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e")`,
+											backgroundPosition: 'right 8px center',
+											backgroundRepeat: 'no-repeat',
+											backgroundSize: '16px'
+										}}
+									>
+										<option value="dark fantasy" className="bg-black text-green-200">Dark Fantasy</option>
+										<option value="horror" className="bg-black text-green-200">Horror</option>
+										<option value="gothic" className="bg-black text-green-200">Gothic</option>
+										<option value="lovecraftian" className="bg-black text-green-200">Lovecraftian</option>
+										<option value="cyberpunk" className="bg-black text-green-200">Cyberpunk</option>
+									</select>
+								</div>
+								<div className="relative">
+									<select
+										value={mapConfig.style}
+										onChange={(e) => handleConfigChange('style', e.target.value)}
+										className="w-full bg-black/80 border border-green-500/40 text-green-200 px-3 py-2 font-mono text-xs focus:border-gold-500 focus:outline-none rounded appearance-none cursor-pointer hover:border-green-400 transition-all"
+										style={{
+											backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e")`,
+											backgroundPosition: 'right 8px center',
+											backgroundRepeat: 'no-repeat',
+											backgroundSize: '16px'
+										}}
+									>
+										<option value="dungeon" className="bg-black text-green-200">Dungeon</option>
+										<option value="overworld" className="bg-black text-green-200">Overworld</option>
+										<option value="city" className="bg-black text-green-200">City</option>
+										<option value="wilderness" className="bg-black text-green-200">Wilderness</option>
+										<option value="underground" className="bg-black text-green-200">Underground</option>
+										<option value="planar" className="bg-black text-green-200">Planar</option>
+									</select>
+								</div>
 							</div>
 
 							{/* Seed */}
@@ -142,40 +283,52 @@ function Map() {
 							<div className="space-y-3">
 								<div className="terminal-text text-xs text-green-400 mb-2">PREVIEW</div>
 								<div className="aspect-square bg-black/60 border border-green-500/20 p-1 relative overflow-hidden rounded">
-									{/* Simulated map preview */}
-									<div className="absolute inset-0 opacity-40">
-										{Array.from({ length: 12 }, (_, row) => (
-											<div key={row} className="flex">
-												{Array.from({ length: 12 }, (_, col) => {
-													const random = (row * 12 + col + mapConfig.seed) % 100
-													let bgColor = 'bg-black'
-													if (random > 85) bgColor = 'bg-gray-600'
-													else if (random > 70) bgColor = 'bg-red-600/50'
-													else if (random > 60) bgColor = 'bg-yellow-600/50'
-													else if (random > 50) bgColor = 'bg-blue-600/50'
-													else if (random > 40) bgColor = 'bg-green-600/50'
-													else if (random > 30) bgColor = 'bg-purple-600/50'
+									{/* Generated noise map preview */}
+									{generatedMap && !isGenerating ? (
+										<div className="absolute inset-0 overflow-auto p-2">
+											<div className="grid gap-0 mx-auto" style={{
+												gridTemplateColumns: `repeat(${generatedMap[0].length}, 1fr)`,
+												width: 'fit-content',
+												height: 'fit-content'
+											}}>
+												{generatedMap.flat().map((cell, index) => {
+													let bgColor = 'bg-blue-900' // water
+													if (cell.type === 'coast') bgColor = 'bg-yellow-600'
+													else if (cell.type === 'land') bgColor = 'bg-green-700'
+													else if (cell.type === 'mountain') bgColor = 'bg-gray-600'
+													else if (cell.type === 'peak') bgColor = 'bg-gray-400'
 													
 													return (
 														<div 
-															key={col} 
+															key={index}
 															className={`w-2 h-2 ${bgColor} border border-green-500/10`}
+															title={`${cell.type}: ${cell.value.toFixed(2)}`}
 														/>
 													)
 												})}
 											</div>
-										))}
-									</div>
-									
-									{/* Overlay */}
-									<div className="absolute inset-0 flex items-center justify-center">
-										<div className="text-center">
-											<div className="terminal-text text-green-400 text-xs mb-1">GENERATING...</div>
-											<div className="terminal-text text-green-300 text-xs uppercase">
-												{mapConfig.size}
+										</div>
+									) : (
+										<div className="absolute inset-0 flex items-center justify-center">
+											<div className="text-center">
+												{isGenerating ? (
+													<>
+														<div className="terminal-text text-green-400 text-xs mb-1">GENERATING...</div>
+														<div className="terminal-text text-green-300 text-xs uppercase">
+															{mapConfig.terrainType}
+														</div>
+													</>
+												) : (
+													<>
+														<div className="terminal-text text-green-400 text-xs mb-1">READY</div>
+														<div className="terminal-text text-green-300 text-xs uppercase">
+															{mapConfig.size}
+														</div>
+													</>
+												)}
 											</div>
 										</div>
-									</div>
+									)}
 								</div>
 							</div>
 
@@ -189,15 +342,32 @@ function Map() {
 											<span className="text-gold-light uppercase">{mapConfig.size}</span>
 										</div>
 										<div className="flex justify-between">
-											<span>Style:</span>
-											<span className="text-gold-light uppercase">{mapConfig.style}</span>
+											<span>Terrain:</span>
+											<span className="text-gold-light uppercase">{mapConfig.terrainType}</span>
 										</div>
 										<div className="flex justify-between">
 											<span>Seed:</span>
 											<span className="text-gold-light">{mapConfig.seed}</span>
 										</div>
+										<div className="flex justify-between">
+											<span>Status:</span>
+											<span className={`${generatedMap ? 'text-green-400' : 'text-yellow-400'}`}>
+												{generatedMap ? 'GENERATED' : 'READY'}
+											</span>
+										</div>
 									</div>
 								</div>
+								<button
+									onClick={generateNoiseMap}
+									disabled={isGenerating}
+									className={`w-full px-3 py-2 border font-mono text-xs uppercase tracking-wider transition-all rounded mb-2 ${
+										isGenerating
+											? 'border-gray-500 text-gray-400 bg-gray-500/20 cursor-not-allowed'
+											: 'border-blue-500 text-blue-100 bg-blue-500/20 hover:bg-blue-500/30 hover:border-gold-500 hover:text-gold-200'
+									}`}
+								>
+									{isGenerating ? '⏳ GENERATING...' : '🌊 GENERATE MAP'}
+								</button>
 								<button
 									onClick={randomizeMap}
 									className="w-full px-3 py-2 border border-yellow-500 text-yellow-100 bg-yellow-500/20 font-mono text-xs uppercase tracking-wider transition-all hover:bg-yellow-500/30 hover:border-gold-500 hover:text-gold-200 rounded mb-2"
@@ -206,7 +376,12 @@ function Map() {
 								</button>
 								<button
 									onClick={downloadMap}
-									className="w-full px-3 py-2 border border-green-500 text-green-100 bg-green-500/20 font-mono text-xs uppercase tracking-wider transition-all hover:bg-green-500/30 hover:border-gold-500 hover:text-gold-200 rounded"
+									disabled={!generatedMap}
+									className={`w-full px-3 py-2 border font-mono text-xs uppercase tracking-wider transition-all rounded ${
+										!generatedMap
+											? 'border-gray-500 text-gray-400 bg-gray-500/20 cursor-not-allowed'
+											: 'border-green-500 text-green-100 bg-green-500/20 hover:bg-green-500/30 hover:border-gold-500 hover:text-gold-200'
+									}`}
 								>
 									⬇️ DOWNLOAD
 								</button>
