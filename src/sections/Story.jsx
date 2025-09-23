@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import { API_BASE_URL } from '../config'
 
 function Story() {
 	const [config, setConfig] = useState({
@@ -31,7 +32,7 @@ function Story() {
 			console.log("Story Configuration:", config)
 			
 			// Call our local API server
-			const response = await fetch('http://localhost:3001/api/generate-dnd-prompt', {
+			const response = await fetch('${API_BASE_URL}/api/generate-dnd-prompt', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',

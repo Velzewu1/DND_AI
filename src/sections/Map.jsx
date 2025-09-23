@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useMemo } from 'react'
+import { API_BASE_URL } from '../config'
 import { Noise } from 'noisejs'
 import { generateMapDescription, generateASCIIMap } from '../utils/mapAnalysis'
 
@@ -99,7 +100,7 @@ function Map() {
 				throw new Error('Failed to generate PNG from map');
 			}
 
-			const response = await fetch('http://localhost:3001/api/generate-map-image', {
+			const response = await fetch('${API_BASE_URL}/api/generate-map-image', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
