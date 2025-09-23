@@ -6,7 +6,7 @@ import { generateMapDescription, generateASCIIMap } from '../utils/mapAnalysis'
 
 function Map() {
 	const [mapConfig, setMapConfig] = useState({
-		size: "medium",
+		size: 64, // числовой размер карты (medium)
 		genre: "dark fantasy",
 		style: "dungeon",
 		seed: Math.floor(Math.random() * 999999),
@@ -56,12 +56,13 @@ function Map() {
 					const cell = generatedMap[y][x];
 					let color = '#1e3a8a'; // water - синий
 					
-					switch (cell.type) {
-						case 'coast': color = '#fbbf24'; break; // coast - желтый
-						case 'land': color = '#16a34a'; break; // land - зеленый
-						case 'mountain': color = '#6b7280'; break; // mountain - серый
-						case 'peak': color = '#f3f4f6'; break; // peak - белый
-					}
+				switch (cell.type) {
+					case 'coast': color = '#fbbf24'; break; // coast - желтый
+					case 'land': color = '#16a34a'; break; // land - зеленый
+					case 'mountain': color = '#6b7280'; break; // mountain - серый
+					case 'peak': color = '#f3f4f6'; break; // peak - белый
+					case 'special': color = '#a855f7'; break; // special - фиолетовый
+				}
 					
 					ctx.fillStyle = color;
 					ctx.fillRect(x * scale, y * scale, scale, scale);
@@ -108,7 +109,7 @@ function Map() {
 					style: mapConfig.style,
 					genre: mapConfig.genre,
 					terrainType: mapConfig.terrainType,
-					mapPNG // Отправляем PNG вместо ASCII
+					mapPNG // Возвращаем PNG для img2img
 				})
 			});
 
@@ -142,15 +143,19 @@ function Map() {
 			// Create noise instance with seed
 			const noiseInstance = createNoiseInstance(mapConfig.seed)
 			
-			// Map size configuration
-			const sizeConfig = {
-				small: { width: 32, height: 32, scale: 0.1 },
-				medium: { width: 64, height: 64, scale: 0.08 },
-				large: { width: 128, height: 128, scale: 0.06 },
-				massive: { width: 256, height: 256, scale: 0.04 }
-			}
+			// Map size configuration - числовой размер с ограничениями
+			const minSize = 48  // medium
+			const maxSize = 96  // large_minus
+			const mapSize = Math.max(minSize, Math.min(maxSize, mapConfig.size))
 			
-			const config = sizeConfig[mapConfig.size]
+			// Автоматически вычисляем scale на основе размера
+			const scale = Math.max(0.12, 0.08 - (mapSize - 64) * 0.0005)
+			
+			const config = {
+				width: mapSize,
+				height: mapSize,
+				scale: scale
+			}
 			const map = []
 			
 			console.log(`Generating ${mapConfig.terrainType} map: ${config.width}x${config.height} with seed: ${mapConfig.seed}`)
@@ -192,12 +197,15 @@ function Map() {
 							break
 					}
 					
-					// Normalize and classify terrain
+					// Normalize and classify terrain with better thresholds
 					let terrainType = 'water'
-					if (noiseValue > 0.1) terrainType = 'coast'
-					if (noiseValue > 0.3) terrainType = 'land'
-					if (noiseValue > 0.6) terrainType = 'mountain'
-					if (noiseValue > 0.8) terrainType = 'peak'
+					if (noiseValue > 0.05) terrainType = 'coast'
+					if (noiseValue > 0.2) terrainType = 'land'
+					if (noiseValue > 0.4) terrainType = 'mountain'
+					if (noiseValue > 0.6) terrainType = 'peak'
+					
+					// Add special terrain for very high values
+					if (noiseValue > 0.8) terrainType = 'special'
 					
 					row.push({
 						value: noiseValue,
@@ -223,13 +231,15 @@ function Map() {
 	}
 
 	const randomizeMap = () => {
-		const sizes = ["small", "medium", "large", "massive"]
 		const styles = ["dungeon", "overworld", "city", "wilderness", "underground", "planar"]
 		const terrainTypes = ["archipelago", "continent", "2 continents"]
 		
+		// Случайный размер между 48 и 96
+		const randomSize = Math.floor(Math.random() * (96 - 48 + 1)) + 48
+		
 		setMapConfig(prev => ({
 			...prev,
-			size: sizes[Math.floor(Math.random() * sizes.length)],
+			size: randomSize,
 			style: styles[Math.floor(Math.random() * styles.length)],
 			terrainType: terrainTypes[Math.floor(Math.random() * terrainTypes.length)],
 			seed: Math.floor(Math.random() * 999999)
@@ -237,22 +247,85 @@ function Map() {
 	}
 
 	const downloadMap = () => {
-		if (generatedMap) {
-			console.log("Downloading map:", mapConfig, generatedMap)
-			alert(`Downloading ${mapConfig.size} ${mapConfig.terrainType} map...`)
-		} else {
+		if (!generatedMap) {
 			alert("Generate a map first!")
+			return
+		}
+
+		try {
+			// Создаем PNG из карты
+			const canvas = document.createElement('canvas')
+			const ctx = canvas.getContext('2d')
+			
+			const scale = 16
+			const mapWidth = generatedMap[0].length
+			const mapHeight = generatedMap.length
+			
+			canvas.width = mapWidth * scale
+			canvas.height = mapHeight * scale
+
+			// Рендерим карту
+			for (let y = 0; y < mapHeight; y++) {
+				for (let x = 0; x < mapWidth; x++) {
+					const cell = generatedMap[y][x]
+					let color = '#1e3a8a' // water
+					
+					switch (cell.type) {
+						case 'coast': color = '#fbbf24'; break
+						case 'land': color = '#16a34a'; break
+						case 'mountain': color = '#6b7280'; break
+						case 'peak': color = '#f3f4f6'; break
+						case 'special': color = '#a855f7'; break
+					}
+					
+					ctx.fillStyle = color
+					ctx.fillRect(x * scale, y * scale, scale, scale)
+				}
+			}
+
+			// Создаем ссылку для скачивания
+			const link = document.createElement('a')
+			link.download = `${mapConfig.terrainType}_${mapConfig.size}_seed_${mapConfig.seed}.png`
+			link.href = canvas.toDataURL('image/png')
+			link.click()
+
+			console.log(`Downloaded: ${mapConfig.terrainType}_${mapConfig.size}_seed_${mapConfig.seed}.png`)
+		} catch (error) {
+			console.error('Error downloading map:', error)
+			alert('Error downloading map. Please try again.')
 		}
 	}
 
 	return (
-		<section id="map" className="h-screen w-screen text-white flex items-center justify-center px-4 relative">
-			{/* Unified overlay */}
-			<div className="absolute inset-0 bg-black/30" />
+		<section id="map" className="h-screen w-screen text-white flex items-center justify-center px-4 relative overflow-hidden">
+			{/* Enhanced background effects */}
+			<div className="absolute inset-0 bg-gradient-to-br from-black/40 via-black/20 to-black/40" />
+			<div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(16,185,129,0.1),transparent_50%)]" />
+			<div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_75%,rgba(168,85,247,0.08),transparent_50%)]" />
+			<div className="absolute inset-0 bg-[conic-gradient(from_0deg_at_50%_50%,transparent_0deg,rgba(16,185,129,0.05)_60deg,transparent_120deg,rgba(168,85,247,0.05)_180deg,transparent_240deg)] animate-spin" style={{animationDuration: '20s'}} />
+			<div className="absolute inset-0 bg-[linear-gradient(135deg,transparent_0%,rgba(16,185,129,0.02)_25%,transparent_50%,rgba(168,85,247,0.02)_75%,transparent_100%)] animate-pulse" style={{animationDuration: '6s'}} />
+			
+			{/* Floating map markers */}
+			<div className="absolute inset-0">
+				{[...Array(18)].map((_, i) => (
+					<div
+						key={i}
+						className="absolute w-1 h-1 bg-yellow-400/40 rounded-full animate-pulse"
+						style={{
+							left: `${Math.random() * 100}%`,
+							top: `${Math.random() * 100}%`,
+							animationDelay: `${Math.random() * 7}s`,
+							animationDuration: `${3 + Math.random() * 3}s`
+						}}
+					/>
+				))}
+			</div>
 			
 			<div className="max-w-6xl w-full relative z-10">
 				{/* Unified Interface Panel */}
-				<div className="bg-black/90 border border-green-500/40 shadow-lg shadow-green-500/10 relative rounded">
+				<div className="bg-black/90 border border-green-500/40 shadow-lg shadow-green-500/10 relative rounded backdrop-blur-sm">
+					{/* Glow effect */}
+					<div className="absolute inset-0 bg-gradient-to-r from-green-500/5 via-transparent to-green-500/5 rounded pointer-events-none" />
 					{/* Header */}
 					<div className="bg-green-500/10 border-b border-green-500/30 px-4 py-3 flex items-center justify-center">
 						<div className="fantasy-title text-xl text-gold-primary ancient-glow">
@@ -266,20 +339,20 @@ function Map() {
 							{/* Configuration */}
 							<div className="space-y-3">
 								<div className="terminal-text text-xs text-green-400 mb-2">CONFIG</div>
-								<div className="grid grid-cols-2 gap-1 mb-2">
-									{['small', 'medium', 'large', 'massive'].map(size => (
-										<button
-											key={size}
-											onClick={() => handleConfigChange('size', size)}
-											className={`px-2 py-1 border font-mono text-xs transition-all uppercase ${
-												mapConfig.size === size
-													? 'bg-green-500/30 border-green-400 text-green-100'
-													: 'bg-black/60 border-green-500/30 text-green-300 hover:border-green-400'
-											}`}
-										>
-											{size}
-										</button>
-									))}
+								<div className="mb-2">
+									<div className="terminal-text text-xs text-green-400 mb-1">SIZE (48-96)</div>
+									<input
+										type="number"
+										min="48"
+										max="96"
+										value={mapConfig.size}
+										onChange={(e) => handleConfigChange('size', parseInt(e.target.value) || 64)}
+										className="w-full px-2 py-1 bg-black/60 border border-green-500/30 text-green-300 font-mono text-xs focus:border-green-400 focus:outline-none"
+										placeholder="64"
+									/>
+									<div className="text-xs text-green-500/60 mt-1">
+										Current: {mapConfig.size}x{mapConfig.size}
+									</div>
 								</div>
 								<div className="terminal-text text-xs text-green-400 mb-1">TERRAIN TYPE</div>
 								<div className="grid grid-cols-1 gap-1 mb-2">
@@ -355,31 +428,31 @@ function Map() {
 										🎲
 									</button>
 								</div>
-								<div className="terminal-text text-xs text-green-400 mb-1 mt-3">LEGEND</div>
+								<div className="terminal-text text-xs text-green-400 mb-1 mt-3">TERRAIN LEGEND</div>
 								<div className="grid grid-cols-2 gap-1 text-xs font-mono">
 									<div className="flex items-center gap-1">
-										<div className="w-2 h-2 bg-gray-600 border border-gray-500"></div>
-										<span className="text-gray-300">Wall</span>
-									</div>
-									<div className="flex items-center gap-1">
-										<div className="w-2 h-2 bg-yellow-600 border border-yellow-500"></div>
-										<span className="text-yellow-300">Gold</span>
-									</div>
-									<div className="flex items-center gap-1">
-										<div className="w-2 h-2 bg-red-600 border border-red-500"></div>
-										<span className="text-red-300">Trap</span>
-									</div>
-									<div className="flex items-center gap-1">
-										<div className="w-2 h-2 bg-blue-600 border border-blue-500"></div>
+										<div className="w-2 h-2 bg-blue-900 border border-blue-500"></div>
 										<span className="text-blue-300">Water</span>
 									</div>
 									<div className="flex items-center gap-1">
-										<div className="w-2 h-2 bg-green-600 border border-green-500"></div>
-										<span className="text-green-300">Exit</span>
+										<div className="w-2 h-2 bg-yellow-600 border border-yellow-500"></div>
+										<span className="text-yellow-300">Coast</span>
+									</div>
+									<div className="flex items-center gap-1">
+										<div className="w-2 h-2 bg-green-700 border border-green-500"></div>
+										<span className="text-green-300">Land</span>
+									</div>
+									<div className="flex items-center gap-1">
+										<div className="w-2 h-2 bg-gray-600 border border-gray-500"></div>
+										<span className="text-gray-300">Mountain</span>
+									</div>
+									<div className="flex items-center gap-1">
+										<div className="w-2 h-2 bg-gray-400 border border-gray-300"></div>
+										<span className="text-gray-200">Peak</span>
 									</div>
 									<div className="flex items-center gap-1">
 										<div className="w-2 h-2 bg-purple-600 border border-purple-500"></div>
-										<span className="text-purple-300">Magic</span>
+										<span className="text-purple-300">Special</span>
 									</div>
 								</div>
 							</div>
@@ -408,6 +481,7 @@ function Map() {
 													else if (cell.type === 'land') bgColor = 'bg-green-700'
 													else if (cell.type === 'mountain') bgColor = 'bg-gray-600'
 													else if (cell.type === 'peak') bgColor = 'bg-gray-400'
+													else if (cell.type === 'special') bgColor = 'bg-purple-600'
 													
 													return (
 														<div 
@@ -446,6 +520,28 @@ function Map() {
 							{/* Stats & Actions */}
 							<div className="space-y-3 col-span-1">
 								<div className="terminal-text text-xs text-green-400 mb-2">STATUS</div>
+								
+								{/* Chronicles & Legends Info */}
+								<div className="bg-black/40 p-3 border border-green-500/20 rounded mb-3">
+									<div className="text-xs font-mono text-green-300 space-y-2">
+										<div className="text-green-400 font-bold">📜 CHRONICLES & LEGENDS</div>
+										<div className="text-xs text-gray-300">
+											Use generated maps as inspiration for:
+										</div>
+										<div className="text-xs text-gray-300 space-y-1">
+											• <span className="text-yellow-300">Chronicles</span> - Historical events and timelines
+										</div>
+										<div className="text-xs text-gray-300 space-y-1">
+											• <span className="text-purple-300">Legends</span> - Myths and folklore of the land
+										</div>
+										<div className="text-xs text-gray-300 space-y-1">
+											• <span className="text-blue-300">Adventures</span> - Quest locations and dungeons
+										</div>
+										<div className="text-xs text-gray-300 space-y-1">
+											• <span className="text-red-300">Campaigns</span> - Long-term story arcs
+										</div>
+									</div>
+								</div>
 								<div className="bg-black/40 p-3 border border-green-500/20 rounded mb-3">
 									<div className="text-xs font-mono text-green-300 space-y-1">
 										<div className="flex justify-between">
@@ -481,8 +577,21 @@ function Map() {
 														alt="Generated Map" 
 														className="w-full h-auto rounded border border-green-500/20"
 													/>
-													<div className="text-xs text-green-300 text-center">
-														✨ AI Generated Map
+													<div className="flex justify-between items-center mt-2">
+														<div className="text-xs text-green-300">
+															✨ AI Generated Map
+														</div>
+														<button
+															onClick={() => {
+																const link = document.createElement('a')
+																link.download = `ai_${mapConfig.terrainType}_${mapConfig.size}_${mapConfig.genre}.png`
+																link.href = generatedImage
+																link.click()
+															}}
+															className="px-2 py-1 bg-green-500/20 border border-green-500/40 text-green-300 text-xs font-mono hover:bg-green-500/30 transition-all rounded"
+														>
+															⬇️ Download
+														</button>
 													</div>
 												</div>
 											) : imageError ? (
@@ -497,10 +606,10 @@ function Map() {
 								<button
 									onClick={generateNoiseMap}
 									disabled={isGenerating}
-									className={`w-full px-3 py-2 border font-mono text-xs uppercase tracking-wider transition-all rounded mb-2 ${
+									className={`w-full px-3 py-2 border font-mono text-xs uppercase tracking-wider transition-all duration-300 rounded mb-2 transform hover:scale-105 ${
 										isGenerating
-											? 'border-gray-500 text-gray-400 bg-gray-500/20 cursor-not-allowed'
-											: 'border-blue-500 text-blue-100 bg-blue-500/20 hover:bg-blue-500/30 hover:border-gold-500 hover:text-gold-200'
+											? 'border-gray-500 text-gray-400 bg-gray-500/20 cursor-not-allowed animate-pulse'
+											: 'border-blue-500 text-blue-100 bg-blue-500/20 hover:bg-blue-500/30 hover:border-gold-500 hover:text-gold-200 hover:shadow-lg hover:shadow-blue-500/20'
 									}`}
 								>
 									{isGenerating ? '⏳ GENERATING...' : '🌊 GENERATE MAP'}

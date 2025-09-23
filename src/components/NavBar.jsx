@@ -16,11 +16,21 @@ function NavBar() {
 			const sectionElements = sections.map(id => document.getElementById(id))
 			
 			let current = 'hero'
+			
+			// More accurate section detection
 			sectionElements.forEach((element, index) => {
-				if (element && element.offsetTop <= scrollPosition + 100) {
-					current = sections[index]
+				if (element) {
+					const rect = element.getBoundingClientRect()
+					const elementTop = rect.top + scrollPosition
+					const elementBottom = elementTop + rect.height
+					
+					// Check if section is in viewport
+					if (scrollPosition >= elementTop - 200 && scrollPosition < elementBottom - 100) {
+						current = sections[index]
+					}
 				}
 			})
+			
 			setActiveSection(current)
 		}
 
@@ -84,7 +94,10 @@ function NavBar() {
 
 				{/* Action */}
 				<div className="hidden md:flex">
-					<button className="fantasy-button px-5 py-2 text-xs hover:scale-105 transition-transform">
+					<button 
+						onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+						className="fantasy-button px-5 py-2 text-xs hover:scale-105 transition-transform"
+					>
 						Enter Realm
 					</button>
 				</div>

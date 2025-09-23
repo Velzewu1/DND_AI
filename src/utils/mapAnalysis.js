@@ -9,6 +9,7 @@ export const analyzeMap = (map) => {
     land: 0,
     mountain: 0,
     peak: 0,
+    special: 0,
     total: 0
   };
 
@@ -36,6 +37,7 @@ export const analyzeMap = (map) => {
   if (percentages.mountain > 20) features.push('mountainous');
   if (percentages.peak > 5) features.push('high peaks');
   if (percentages.coast > 15) features.push('extensive coastlines');
+  if (percentages.special > 2) features.push('magical anomalies');
 
   return {
     stats,
@@ -59,6 +61,7 @@ export const generateMapDescription = (map, config) => {
   if (percentages.land > 0) terrainParts.push(`${percentages.land}% land`);
   if (percentages.mountain > 0) terrainParts.push(`${percentages.mountain}% mountains`);
   if (percentages.peak > 0) terrainParts.push(`${percentages.peak}% peaks`);
+  if (percentages.special > 0) terrainParts.push(`${percentages.special}% special`);
   
   description += terrainParts.join(', ') + '. ';
   
@@ -97,6 +100,7 @@ export const generateASCIIMap = (map) => {
         case 'land': return '█';
         case 'mountain': return '▲';
         case 'peak': return '▲';
+        case 'special': return '★';
         default: return '·';
       }
     }).join('')
