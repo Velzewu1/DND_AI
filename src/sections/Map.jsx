@@ -100,7 +100,7 @@ function Map() {
 				throw new Error('Failed to generate PNG from map');
 			}
 
-			const response = await fetch('${API_BASE_URL}/api/generate-map-image', {
+			const response = await fetch(`${API_BASE_URL}/api/generate-map-image`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',

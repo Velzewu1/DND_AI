@@ -69,7 +69,7 @@ function Characters() {
 		setGeneratedCharacter("")
 		
 		try {
-			const response = await fetch('${API_BASE_URL}/api/generate-character', {
+			const response = await fetch(`${API_BASE_URL}/api/generate-character`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -111,7 +111,7 @@ function Characters() {
 		try {
 			console.log("Generating character image:", character)
 			
-			const response = await fetch('${API_BASE_URL}/api/generate-character-image', {
+			const response = await fetch(`${API_BASE_URL}/api/generate-character-image`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',

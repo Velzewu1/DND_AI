@@ -30,9 +30,11 @@ function Story() {
 		
 		try {
 			console.log("Story Configuration:", config)
+			console.log("API_BASE_URL:", API_BASE_URL)
+			console.log("Full URL:", `${API_BASE_URL}/api/generate-dnd-prompt`)
 			
 			// Call our local API server
-			const response = await fetch('${API_BASE_URL}/api/generate-dnd-prompt', {
+			const response = await fetch(`${API_BASE_URL}/api/generate-dnd-prompt`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
