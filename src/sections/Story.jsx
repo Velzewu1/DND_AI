@@ -1,6 +1,8 @@
 'use client'
 
 import React, { useState } from 'react'
+import { API_BASE_URL } from '../config'
+import GeneratingText from '../components/GeneratingText'
 
 function Story() {
 	const [config, setConfig] = useState({
@@ -29,9 +31,11 @@ function Story() {
 		
 		try {
 			console.log("Story Configuration:", config)
+			console.log("API_BASE_URL:", API_BASE_URL)
+			console.log("Full URL:", `${API_BASE_URL}/api/generate-dnd-prompt`)
 			
 			// Call our local API server
-			const response = await fetch('http://localhost:3001/api/generate-dnd-prompt', {
+			const response = await fetch(`${API_BASE_URL}/api/generate-dnd-prompt`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -65,9 +69,28 @@ function Story() {
 	}
 
 	return (
-		<section id="story" className="h-screen w-screen text-white flex items-center justify-center px-4 relative">
-			{/* Unified overlay */}
-			<div className="absolute inset-0 bg-black/30" />
+		<section id="story" className="h-screen w-screen text-white flex items-center justify-center px-4 relative overflow-hidden">
+			{/* Enhanced background effects */}
+			<div className="absolute inset-0 bg-gradient-to-br from-black/40 via-black/20 to-black/40" />
+			<div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(16,185,129,0.1),transparent_50%)]" />
+			<div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_70%,rgba(168,85,247,0.08),transparent_50%)]" />
+			<div className="absolute inset-0 bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0deg,rgba(16,185,129,0.05)_120deg,transparent_240deg,rgba(168,85,247,0.05)_360deg)] animate-spin" style={{animationDuration: '25s'}} />
+			
+			{/* Floating magical orbs */}
+			<div className="absolute inset-0">
+				{[...Array(15)].map((_, i) => (
+					<div
+						key={i}
+						className="absolute w-2 h-2 bg-purple-400/40 rounded-full animate-pulse"
+						style={{
+							left: `${Math.random() * 100}%`,
+							top: `${Math.random() * 100}%`,
+							animationDelay: `${Math.random() * 4}s`,
+							animationDuration: `${3 + Math.random() * 2}s`
+						}}
+					/>
+				))}
+			</div>
 			
 			<div className="max-w-6xl w-full relative z-10">
 				{/* Unified Interface Panel */}
@@ -203,7 +226,9 @@ function Story() {
 											: 'border-green-500 text-green-100 bg-green-500/20 hover:bg-green-500/30 hover:border-gold-500 hover:text-gold-200'
 									}`}
 								>
-									{isGenerating ? 'GENERATING...' : !config.setting.trim() ? 'BLOCKED' : 'EXECUTE'}
+									{isGenerating ? (
+										<GeneratingText text="GENERATING" />
+									) : !config.setting.trim() ? 'BLOCKED' : 'EXECUTE'}
 								</button>
 							</div>
 						</div>
@@ -212,9 +237,9 @@ function Story() {
 
 				{/* Generated Story Display */}
 				{(generatedStory || error) && (
-					<div className="mt-6 bg-black/90 border border-green-500/40 shadow-lg shadow-green-500/10 rounded">
+					<div className="mt-6 bg-black/90 border border-green-500/40 shadow-lg shadow-green-500/10 rounded max-h-[60vh] flex flex-col">
 						{/* Header */}
-						<div className="bg-green-500/10 border-b border-green-500/30 px-4 py-3 flex items-center justify-between">
+						<div className="bg-green-500/10 border-b border-green-500/30 px-4 py-3 flex items-center justify-between flex-shrink-0">
 							<div className="fantasy-title text-lg text-gold-primary ancient-glow">
 								Generated Chronicle
 							</div>
@@ -230,7 +255,7 @@ function Story() {
 						</div>
 
 						{/* Content */}
-						<div className="p-6">
+						<div className="p-6 overflow-y-auto flex-1">
 							{error ? (
 								<div className="text-red-400 font-mono text-sm bg-red-500/10 border border-red-500/30 p-4 rounded">
 									<div className="text-red-300 mb-2">ERROR:</div>

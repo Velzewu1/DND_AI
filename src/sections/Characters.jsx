@@ -1,6 +1,8 @@
 'use client'
 
 import React, { useState } from 'react'
+import { API_BASE_URL } from '../config'
+import GeneratingText from '../components/GeneratingText'
 
 function Characters() {
 	const [character, setCharacter] = useState({
@@ -68,7 +70,7 @@ function Characters() {
 		setGeneratedCharacter("")
 		
 		try {
-			const response = await fetch('http://localhost:3001/api/generate-character', {
+			const response = await fetch(`${API_BASE_URL}/api/generate-character`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -110,7 +112,7 @@ function Characters() {
 		try {
 			console.log("Generating character image:", character)
 			
-			const response = await fetch('http://localhost:3001/api/generate-character-image', {
+			const response = await fetch(`${API_BASE_URL}/api/generate-character-image`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -148,9 +150,28 @@ function Characters() {
 	}
 
 	return (
-		<section id="characters" className="h-screen w-screen text-white flex items-center justify-center px-4 relative">
-			{/* Unified overlay */}
-			<div className="absolute inset-0 bg-black/30" />
+		<section id="characters" className="h-screen w-screen text-white flex items-center justify-center px-4 relative overflow-hidden">
+			{/* Enhanced background effects */}
+			<div className="absolute inset-0 bg-gradient-to-br from-black/40 via-black/20 to-black/40" />
+			<div className="absolute inset-0 bg-[radial-gradient(circle_at_40%_20%,rgba(16,185,129,0.1),transparent_50%)]" />
+			<div className="absolute inset-0 bg-[radial-gradient(circle_at_60%_80%,rgba(168,85,247,0.08),transparent_50%)]" />
+			<div className="absolute inset-0 bg-[conic-gradient(from_180deg_at_50%_50%,transparent_0deg,rgba(16,185,129,0.05)_90deg,transparent_180deg,rgba(168,85,247,0.05)_270deg,transparent_360deg)] animate-spin" style={{animationDuration: '35s'}} />
+			
+			{/* Floating character spirits */}
+			<div className="absolute inset-0">
+				{[...Array(12)].map((_, i) => (
+					<div
+						key={i}
+						className="absolute w-1.5 h-1.5 bg-blue-400/40 rounded-full animate-pulse"
+						style={{
+							left: `${Math.random() * 100}%`,
+							top: `${Math.random() * 100}%`,
+							animationDelay: `${Math.random() * 6}s`,
+							animationDuration: `${4 + Math.random() * 2}s`
+						}}
+					/>
+				))}
+			</div>
 			
 			<div className="max-w-6xl w-full relative z-10">
 				{/* Unified Interface Panel */}
@@ -348,7 +369,7 @@ function Characters() {
 									onClick={shuffleCharacter}
 									className="w-full px-3 py-2 border border-yellow-500 text-yellow-100 bg-yellow-500/20 font-mono text-xs uppercase tracking-wider transition-all hover:bg-yellow-500/30 hover:border-gold-500 hover:text-gold-200 rounded mb-2"
 								>
-									🎲 RANDOMIZE
+									RANDOMIZE
 								</button>
 								<button
 									onClick={generateCharacterBackstory}
@@ -359,7 +380,9 @@ function Characters() {
 											: 'border-green-500 text-green-100 bg-green-500/20 hover:bg-green-500/30 hover:border-gold-500 hover:text-gold-200'
 									}`}
 								>
-									{isGenerating ? '🧠 THINKING...' : '🧠 AI BACKSTORY'}
+									{isGenerating ? (
+										<GeneratingText text="THINKING" />
+									) : 'AI BACKSTORY'}
 								</button>
 								<button
 									onClick={generateImage}
@@ -370,7 +393,9 @@ function Characters() {
 											: 'border-purple-500 text-purple-100 bg-purple-500/20 hover:bg-purple-500/30 hover:border-gold-500 hover:text-gold-200'
 									}`}
 								>
-									{isGeneratingImage ? '🎨 CREATING...' : '🎨 IMAGE'}
+									{isGeneratingImage ? (
+										<GeneratingText text="CREATING" />
+									) : 'IMAGE'}
 								</button>
 							</div>
 						</div>
@@ -379,9 +404,9 @@ function Characters() {
 
 				{/* Generated Character Display */}
 				{(generatedCharacter || error) && (
-					<div className="mt-6 bg-black/90 border border-green-500/40 shadow-lg shadow-green-500/10 rounded">
+					<div className="mt-6 bg-black/90 border border-green-500/40 shadow-lg shadow-green-500/10 rounded max-h-[60vh] flex flex-col">
 						{/* Header */}
-						<div className="bg-green-500/10 border-b border-green-500/30 px-4 py-3 flex items-center justify-between">
+						<div className="bg-green-500/10 border-b border-green-500/30 px-4 py-3 flex items-center justify-between flex-shrink-0">
 							<div className="fantasy-title text-lg text-gold-primary ancient-glow">
 								Character Profile
 							</div>
@@ -397,7 +422,7 @@ function Characters() {
 						</div>
 
 						{/* Content */}
-						<div className="p-6">
+						<div className="p-6 overflow-y-auto flex-1">
 							{error ? (
 								<div className="text-red-400 font-mono text-sm bg-red-500/10 border border-red-500/30 p-4 rounded">
 									<div className="text-red-300 mb-2">ERROR:</div>
@@ -414,9 +439,9 @@ function Characters() {
 
 				{/* Generated Image Display */}
 				{(generatedImage || imageError) && (
-					<div className="mt-6 bg-black/90 border border-green-500/40 shadow-lg shadow-green-500/10 rounded">
+					<div className="mt-6 bg-black/90 border border-green-500/40 shadow-lg shadow-green-500/10 rounded max-h-[70vh] flex flex-col">
 						{/* Header */}
-						<div className="bg-green-500/10 border-b border-green-500/30 px-4 py-3 flex items-center justify-between">
+						<div className="bg-green-500/10 border-b border-green-500/30 px-4 py-3 flex items-center justify-between flex-shrink-0">
 							<div className="fantasy-title text-lg text-gold-primary ancient-glow">
 								Character Portrait
 							</div>
@@ -432,7 +457,7 @@ function Characters() {
 						</div>
 
 						{/* Content */}
-						<div className="p-6">
+						<div className="p-6 overflow-y-auto flex-1">
 							{imageError ? (
 								<div className="text-red-400 font-mono text-sm bg-red-500/10 border border-red-500/30 p-4 rounded">
 									<div className="text-red-300 mb-2">IMAGE ERROR:</div>
@@ -444,7 +469,7 @@ function Characters() {
 										src={generatedImage} 
 										alt={`${character.name || 'Character'} - ${character.race} ${character.class}`}
 										className="max-w-full h-auto rounded-lg border border-green-500/30 shadow-lg shadow-green-500/10"
-										style={{ maxHeight: '512px' }}
+										style={{ maxHeight: '400px' }}
 									/>
 									<div className="mt-4 text-center">
 										<div className="text-gold-light font-serif text-lg">

@@ -38,7 +38,7 @@ npm run dev
 
 Visit `http://localhost:5173` and test:
 - **Story Generation**: Go to the Story section, enter a setting, and click "EXECUTE"
-- **Character Generation**: Go to Characters section, configure a character, and click "🧠 AI BACKSTORY"
+- **Character Generation**: Go to Characters section, configure a character, and click "AI BACKSTORY"
 
 ### 3. Deploy to Vercel
 

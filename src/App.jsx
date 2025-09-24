@@ -93,7 +93,7 @@ function App() {
 			
 			{/* Underground section with 3 full-screen parts */}
 			<div 
-				className="relative w-screen h-[300vh] z-[50]"
+				className="relative w-screen h-[300vh] z-[50] overflow-hidden"
 				style={{
 					backgroundImage: `url(/underground_background.jpg)`,
 					backgroundSize: 'cover',
@@ -101,6 +101,28 @@ function App() {
 					backgroundRepeat: 'no-repeat'
 				}}
 			>
+				{/* Enhanced background effects for all sections */}
+				<div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/40" />
+				<div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(16,185,129,0.1),transparent_50%)]" />
+				<div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(168,85,247,0.08),transparent_50%)]" />
+				<div className="absolute inset-0 bg-[conic-gradient(from_45deg_at_50%_50%,transparent_0deg,rgba(16,185,129,0.05)_90deg,transparent_180deg,rgba(168,85,247,0.05)_270deg,transparent_360deg)] animate-spin" style={{animationDuration: '30s'}} />
+				<div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_0%,rgba(16,185,129,0.02)_25%,transparent_50%,rgba(168,85,247,0.02)_75%,transparent_100%)] animate-pulse" style={{animationDuration: '8s'}} />
+				
+				{/* Floating particles effect */}
+				<div className="absolute inset-0">
+					{[...Array(20)].map((_, i) => (
+						<div
+							key={i}
+							className="absolute w-1 h-1 bg-green-400/30 rounded-full animate-pulse"
+							style={{
+								left: `${Math.random() * 100}%`,
+								top: `${Math.random() * 100}%`,
+								animationDelay: `${Math.random() * 5}s`,
+								animationDuration: `${2 + Math.random() * 3}s`
+							}}
+						/>
+					))}
+				</div>
 				{/* Story Section - 1/3 */}
 				<Story />
 				

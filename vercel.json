@@ -1,10 +1,19 @@
 {
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "framework": "vite",
   "functions": {
     "api/generate-dnd-prompt.js": {
       "maxDuration": 30
+    },
+    "api/generate-character.js": {
+      "maxDuration": 30
+    },
+    "api/generate-character-image.js": {
+      "maxDuration": 60
+    },
+    "api/generate-map-image.js": {
+      "maxDuration": 60
     }
-  },
-  "env": {
-    "OPENAI_API_KEY": "@openai-api-key"
   }
 }
