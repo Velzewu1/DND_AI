@@ -571,15 +571,18 @@ function Map() {
 								{(generatedImage || imageError) && (
 									<div className="space-y-3">
 										<div className="terminal-text text-xs text-green-400 mb-2">GENERATED IMAGE</div>
-										<div className="bg-black/40 p-3 border border-green-500/20 rounded">
+										<div className="bg-black/40 p-3 border border-green-500/20 rounded max-h-[50vh] flex flex-col">
 											{generatedImage ? (
-												<div className="space-y-2">
-													<img 
-														src={generatedImage} 
-														alt="Generated Map" 
-														className="w-full h-auto rounded border border-green-500/20"
-													/>
-													<div className="flex justify-between items-center mt-2">
+												<div className="space-y-2 flex flex-col flex-1">
+													<div className="overflow-y-auto flex-1">
+														<img 
+															src={generatedImage} 
+															alt="Generated Map" 
+															className="w-full h-auto rounded border border-green-500/20"
+															style={{ maxHeight: '300px' }}
+														/>
+													</div>
+													<div className="flex justify-between items-center mt-2 flex-shrink-0">
 														<div className="text-xs text-green-300">
 															AI Generated Map
 														</div>
@@ -594,19 +597,6 @@ function Map() {
 																className="px-2 py-1 bg-green-500/20 border border-green-500/40 text-green-300 text-xs font-mono hover:bg-green-500/30 transition-all rounded"
 															>
 																Download
-															</button>
-															<button
-																onClick={generateMapImage}
-																disabled={isGeneratingImage}
-																className="px-2 py-1 bg-purple-500/20 border border-purple-500/40 text-purple-300 text-xs font-mono hover:bg-purple-500/30 transition-all rounded disabled:opacity-50"
-															>
-																{isGeneratingImage ? (
-																	<GeneratingText text="New Image" />
-																) : (
-																	<div className="flex items-center gap-1">
-																		<span>New Image</span>
-																	</div>
-																)}
 															</button>
 														</div>
 													</div>

@@ -404,9 +404,9 @@ function Characters() {
 
 				{/* Generated Character Display */}
 				{(generatedCharacter || error) && (
-					<div className="mt-6 bg-black/90 border border-green-500/40 shadow-lg shadow-green-500/10 rounded">
+					<div className="mt-6 bg-black/90 border border-green-500/40 shadow-lg shadow-green-500/10 rounded max-h-[60vh] flex flex-col">
 						{/* Header */}
-						<div className="bg-green-500/10 border-b border-green-500/30 px-4 py-3 flex items-center justify-between">
+						<div className="bg-green-500/10 border-b border-green-500/30 px-4 py-3 flex items-center justify-between flex-shrink-0">
 							<div className="fantasy-title text-lg text-gold-primary ancient-glow">
 								Character Profile
 							</div>
@@ -422,7 +422,7 @@ function Characters() {
 						</div>
 
 						{/* Content */}
-						<div className="p-6">
+						<div className="p-6 overflow-y-auto flex-1">
 							{error ? (
 								<div className="text-red-400 font-mono text-sm bg-red-500/10 border border-red-500/30 p-4 rounded">
 									<div className="text-red-300 mb-2">ERROR:</div>
@@ -439,9 +439,9 @@ function Characters() {
 
 				{/* Generated Image Display */}
 				{(generatedImage || imageError) && (
-					<div className="mt-6 bg-black/90 border border-green-500/40 shadow-lg shadow-green-500/10 rounded">
+					<div className="mt-6 bg-black/90 border border-green-500/40 shadow-lg shadow-green-500/10 rounded max-h-[70vh] flex flex-col">
 						{/* Header */}
-						<div className="bg-green-500/10 border-b border-green-500/30 px-4 py-3 flex items-center justify-between">
+						<div className="bg-green-500/10 border-b border-green-500/30 px-4 py-3 flex items-center justify-between flex-shrink-0">
 							<div className="fantasy-title text-lg text-gold-primary ancient-glow">
 								Character Portrait
 							</div>
@@ -457,7 +457,7 @@ function Characters() {
 						</div>
 
 						{/* Content */}
-						<div className="p-6">
+						<div className="p-6 overflow-y-auto flex-1">
 							{imageError ? (
 								<div className="text-red-400 font-mono text-sm bg-red-500/10 border border-red-500/30 p-4 rounded">
 									<div className="text-red-300 mb-2">IMAGE ERROR:</div>
@@ -469,7 +469,7 @@ function Characters() {
 										src={generatedImage} 
 										alt={`${character.name || 'Character'} - ${character.race} ${character.class}`}
 										className="max-w-full h-auto rounded-lg border border-green-500/30 shadow-lg shadow-green-500/10"
-										style={{ maxHeight: '512px' }}
+										style={{ maxHeight: '400px' }}
 									/>
 									<div className="mt-4 text-center">
 										<div className="text-gold-light font-serif text-lg">

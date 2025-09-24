@@ -237,9 +237,9 @@ function Story() {
 
 				{/* Generated Story Display */}
 				{(generatedStory || error) && (
-					<div className="mt-6 bg-black/90 border border-green-500/40 shadow-lg shadow-green-500/10 rounded">
+					<div className="mt-6 bg-black/90 border border-green-500/40 shadow-lg shadow-green-500/10 rounded max-h-[60vh] flex flex-col">
 						{/* Header */}
-						<div className="bg-green-500/10 border-b border-green-500/30 px-4 py-3 flex items-center justify-between">
+						<div className="bg-green-500/10 border-b border-green-500/30 px-4 py-3 flex items-center justify-between flex-shrink-0">
 							<div className="fantasy-title text-lg text-gold-primary ancient-glow">
 								Generated Chronicle
 							</div>
@@ -255,7 +255,7 @@ function Story() {
 						</div>
 
 						{/* Content */}
-						<div className="p-6">
+						<div className="p-6 overflow-y-auto flex-1">
 							{error ? (
 								<div className="text-red-400 font-mono text-sm bg-red-500/10 border border-red-500/30 p-4 rounded">
 									<div className="text-red-300 mb-2">ERROR:</div>
