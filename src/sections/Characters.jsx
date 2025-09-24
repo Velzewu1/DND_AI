@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react'
 import { API_BASE_URL } from '../config'
+import GeneratingText from '../components/GeneratingText'
 
 function Characters() {
 	const [character, setCharacter] = useState({
@@ -368,7 +369,7 @@ function Characters() {
 									onClick={shuffleCharacter}
 									className="w-full px-3 py-2 border border-yellow-500 text-yellow-100 bg-yellow-500/20 font-mono text-xs uppercase tracking-wider transition-all hover:bg-yellow-500/30 hover:border-gold-500 hover:text-gold-200 rounded mb-2"
 								>
-									🎲 RANDOMIZE
+									RANDOMIZE
 								</button>
 								<button
 									onClick={generateCharacterBackstory}
@@ -379,7 +380,9 @@ function Characters() {
 											: 'border-green-500 text-green-100 bg-green-500/20 hover:bg-green-500/30 hover:border-gold-500 hover:text-gold-200'
 									}`}
 								>
-									{isGenerating ? '🧠 THINKING...' : '🧠 AI BACKSTORY'}
+									{isGenerating ? (
+										<GeneratingText text="THINKING" />
+									) : 'AI BACKSTORY'}
 								</button>
 								<button
 									onClick={generateImage}
@@ -390,7 +393,9 @@ function Characters() {
 											: 'border-purple-500 text-purple-100 bg-purple-500/20 hover:bg-purple-500/30 hover:border-gold-500 hover:text-gold-200'
 									}`}
 								>
-									{isGeneratingImage ? '🎨 CREATING...' : '🎨 IMAGE'}
+									{isGeneratingImage ? (
+										<GeneratingText text="CREATING" />
+									) : 'IMAGE'}
 								</button>
 							</div>
 						</div>

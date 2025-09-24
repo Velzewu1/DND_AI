@@ -301,9 +301,9 @@ async function handleCharacterImageGeneration(req, res) {
     
     prompt += stylePrompts[style] || stylePrompts.fantasy_realistic;
 
-    console.log('🎨 Generating image with prompt:', prompt);
+    console.log('Generating image with prompt:', prompt);
 
-    console.log(`🎨 Settings: Style=${style}, Quality=${quality}, Size=${size}`);
+    console.log(`Settings: Style=${style}, Quality=${quality}, Size=${size}`);
 
     const imageResponse = await openai.images.generate({
       model: "dall-e-3",

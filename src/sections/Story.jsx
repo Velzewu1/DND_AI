@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react'
 import { API_BASE_URL } from '../config'
+import GeneratingText from '../components/GeneratingText'
 
 function Story() {
 	const [config, setConfig] = useState({
@@ -225,7 +226,9 @@ function Story() {
 											: 'border-green-500 text-green-100 bg-green-500/20 hover:bg-green-500/30 hover:border-gold-500 hover:text-gold-200'
 									}`}
 								>
-									{isGenerating ? 'GENERATING...' : !config.setting.trim() ? 'BLOCKED' : 'EXECUTE'}
+									{isGenerating ? (
+										<GeneratingText text="GENERATING" />
+									) : !config.setting.trim() ? 'BLOCKED' : 'EXECUTE'}
 								</button>
 							</div>
 						</div>

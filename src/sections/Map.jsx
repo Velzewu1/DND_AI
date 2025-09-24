@@ -4,6 +4,7 @@ import React, { useState, useMemo } from 'react'
 import { API_BASE_URL } from '../config'
 import { Noise } from 'noisejs'
 import { generateMapDescription, generateASCIIMap } from '../utils/mapAnalysis'
+import GeneratingText from '../components/GeneratingText'
 
 function Map() {
 	const [mapConfig, setMapConfig] = useState({
@@ -426,7 +427,7 @@ function Map() {
 										onClick={() => handleConfigChange('seed', Math.floor(Math.random() * 999999))}
 										className="px-2 py-1 border border-green-500/40 text-green-300 bg-black/60 font-mono text-xs hover:border-green-400 transition-all rounded"
 									>
-										🎲
+										RANDOM
 									</button>
 								</div>
 								<div className="terminal-text text-xs text-green-400 mb-1 mt-3">TERRAIN LEGEND</div>
@@ -525,7 +526,7 @@ function Map() {
 								{/* Chronicles & Legends Info */}
 								<div className="bg-black/40 p-3 border border-green-500/20 rounded mb-3">
 									<div className="text-xs font-mono text-green-300 space-y-2">
-										<div className="text-green-400 font-bold">📜 CHRONICLES & LEGENDS</div>
+										<div className="text-green-400 font-bold">CHRONICLES & LEGENDS</div>
 										<div className="text-xs text-gray-300">
 											Use generated maps as inspiration for:
 										</div>
@@ -580,19 +581,34 @@ function Map() {
 													/>
 													<div className="flex justify-between items-center mt-2">
 														<div className="text-xs text-green-300">
-															✨ AI Generated Map
+															AI Generated Map
 														</div>
-														<button
-															onClick={() => {
-																const link = document.createElement('a')
-																link.download = `ai_${mapConfig.terrainType}_${mapConfig.size}_${mapConfig.genre}.png`
-																link.href = generatedImage
-																link.click()
-															}}
-															className="px-2 py-1 bg-green-500/20 border border-green-500/40 text-green-300 text-xs font-mono hover:bg-green-500/30 transition-all rounded"
-														>
-															⬇️ Download
-														</button>
+														<div className="flex gap-2">
+															<button
+																onClick={() => {
+																	const link = document.createElement('a')
+																	link.download = `ai_${mapConfig.terrainType}_${mapConfig.size}_${mapConfig.genre}.png`
+																	link.href = generatedImage
+																	link.click()
+																}}
+																className="px-2 py-1 bg-green-500/20 border border-green-500/40 text-green-300 text-xs font-mono hover:bg-green-500/30 transition-all rounded"
+															>
+																Download
+															</button>
+															<button
+																onClick={generateMapImage}
+																disabled={isGeneratingImage}
+																className="px-2 py-1 bg-purple-500/20 border border-purple-500/40 text-purple-300 text-xs font-mono hover:bg-purple-500/30 transition-all rounded disabled:opacity-50"
+															>
+																{isGeneratingImage ? (
+																	<GeneratingText text="New Image" />
+																) : (
+																	<div className="flex items-center gap-1">
+																		<span>New Image</span>
+																	</div>
+																)}
+															</button>
+														</div>
 													</div>
 												</div>
 											) : imageError ? (
@@ -613,7 +629,9 @@ function Map() {
 											: 'border-blue-500 text-blue-100 bg-blue-500/20 hover:bg-blue-500/30 hover:border-gold-500 hover:text-gold-200 hover:shadow-lg hover:shadow-blue-500/20'
 									}`}
 								>
-									{isGenerating ? '⏳ GENERATING...' : '🌊 GENERATE MAP'}
+									{isGenerating ? (
+										<GeneratingText text="GENERATING" />
+									) : 'GENERATE MAP'}
 								</button>
 								<button
 									onClick={generateMapImage}
@@ -624,14 +642,28 @@ function Map() {
 											: 'border-purple-500 text-purple-100 bg-purple-500/20 hover:bg-purple-500/30 hover:border-gold-500 hover:text-gold-200'
 									}`}
 								>
-									{isGeneratingImage ? '🎨 GENERATING IMAGE...' : '🎨 GENERATE IMAGE'}
+									{isGeneratingImage ? (
+										<GeneratingText text="GENERATING IMAGE" />
+									) : generatedImage ? 'GENERATE NEW IMAGE' : 'GENERATE IMAGE'}
 								</button>
 								<button
 									onClick={randomizeMap}
 									className="w-full px-3 py-2 border border-yellow-500 text-yellow-100 bg-yellow-500/20 font-mono text-xs uppercase tracking-wider transition-all hover:bg-yellow-500/30 hover:border-gold-500 hover:text-gold-200 rounded mb-2"
 								>
-									🎲 RANDOMIZE
+									RANDOMIZE
 								</button>
+								{(generatedMap || generatedImage) && (
+									<button
+										onClick={() => {
+											setGeneratedMap(null);
+											setGeneratedImage(null);
+											setImageError(null);
+										}}
+										className="w-full px-3 py-2 border border-red-500 text-red-100 bg-red-500/20 font-mono text-xs uppercase tracking-wider transition-all hover:bg-red-500/30 hover:border-gold-500 hover:text-gold-200 rounded mb-2"
+									>
+										CLEAR ALL
+									</button>
+								)}
 								<button
 									onClick={downloadMap}
 									disabled={!generatedMap}
@@ -641,7 +673,7 @@ function Map() {
 											: 'border-green-500 text-green-100 bg-green-500/20 hover:bg-green-500/30 hover:border-gold-500 hover:text-gold-200'
 									}`}
 								>
-									⬇️ DOWNLOAD
+									DOWNLOAD
 								</button>
 							</div>
 						</div>
