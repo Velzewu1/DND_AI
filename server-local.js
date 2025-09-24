@@ -1,7 +1,5 @@
-// Local development server for testing API endpoints
 import express from 'express';
 import cors from 'cors';
-import path from 'path';
 import { config } from 'dotenv';
 
 config({ path: '.env.local' });
@@ -9,23 +7,17 @@ config({ path: '.env.local' });
 const app = express();
 const PORT = 3001;
 
-// Middleware
 app.use(cors());
 app.use(express.json());
-
-// Import our API handlers
 async function handleMapImage(req, res) {
   try {
     const { fal } = await import('@fal-ai/client');
     
-    // Конфигурируем Fal.ai
     fal.config({
       credentials: process.env.FAL_KEY
     });
 
     const { mapDescription, style, genre, terrainType, mapPNG } = req.body;
-
-    // Генерируем детальный промпт для карты
     const prompt = `Create a ${style} style ${genre} ${terrainType} map. 
       ${style === 'dungeon' ? 'Dark underground corridors, stone walls, torch-lit passages, secret rooms, traps, and treasure chambers. Isometric view of a dungeon layout.' : 
         style === 'overworld' ? 'Fantasy world map with kingdoms, forests, mountains, rivers, and cities. Medieval cartography style.' :
@@ -39,19 +31,14 @@ async function handleMapImage(req, res) {
       Professional fantasy cartography, detailed, high quality, dark atmosphere, 
       NOT a real world map, NOT Earth, fantasy setting only.`;
 
-    console.log('Generating map with prompt:', prompt);
-    console.log('Using mapPNG for img2img:', mapPNG ? 'Yes' : 'No');
-
     if (!mapPNG) {
       throw new Error('No PNG map provided for img2img');
     }
-
-    // Используем qwen-image-edit-plus для img2img с PNG картой
     const result = await fal.subscribe("fal-ai/qwen-image-edit-plus", {
       input: {
         prompt: prompt,
-        image_urls: [mapPNG], // Используем PNG карту как основу
-        image_size: "square_hd", // 1024x1024
+        image_urls: [mapPNG],
+        image_size: "square_hd",
         num_inference_steps: 50,
         guidance_scale: 4,
         num_images: 1,
@@ -61,13 +48,10 @@ async function handleMapImage(req, res) {
       logs: true,
       onQueueUpdate: (update) => {
         if (update.status === "IN_PROGRESS") {
-          console.log("Generation in progress...");
           update.logs?.map((log) => log.message).forEach(console.log);
         }
       },
     });
-
-    console.log('Generation completed:', result.data);
     
     res.json({ 
       success: true,
@@ -94,7 +78,6 @@ async function handleDndPrompt(req, res) {
 
     const { promptType = 'story', config = {} } = req.body;
 
-    // High randomness D&D prompt templates
     const promptTemplates = {
       story: [
         "Create a mysterious D&D adventure involving an ancient artifact that's been discovered in {setting}. Include unexpected plot twists, memorable NPCs, and challenging encounters suitable for a party of {partySize} level {level} characters.",
@@ -335,20 +318,11 @@ async function handleCharacterImageGeneration(req, res) {
   }
 }
 
-// API routes
 app.post('/api/generate-dnd-prompt', handleDndPrompt);
 app.post('/api/generate-character', handleCharacterGeneration);
 app.post('/api/generate-character-image', handleCharacterImageGeneration);
 app.post('/api/generate-map-image', handleMapImage);
 
-// Log all routes
-console.log('📡 API endpoints:');
-console.log('   POST http://localhost:3001/api/generate-dnd-prompt');
-console.log('   POST http://localhost:3001/api/generate-character');
-console.log('   POST http://localhost:3001/api/generate-character-image');
-console.log('   POST http://localhost:3001/api/generate-map-image');
-
-// Helper function
 function getRandomSetting() {
   const settings = [
     "a haunted forest where the trees whisper ancient secrets",
@@ -361,10 +335,7 @@ function getRandomSetting() {
 }
 
 app.listen(PORT, () => {
-  console.log(`🚀 Local API server running on http://localhost:${PORT}`);
-  console.log(`📡 API endpoints:`);
-  console.log(`   POST http://localhost:${PORT}/api/generate-dnd-prompt`);
-  console.log(`   POST http://localhost:${PORT}/api/generate-character`);
-  console.log(`🔑 OpenAI API Key: ${process.env.OPENAI_API_KEY ? '✅ Loaded' : '❌ Missing'}`);
-  console.log(`🔑 Fal.ai API Key: ${process.env.FAL_KEY ? '✅ Loaded' : '❌ Missing'}`);
+  console.log(`Local API server running on http://localhost:${PORT}`);
+  console.log(`OpenAI API Key: ${process.env.OPENAI_API_KEY ? 'Loaded' : 'Missing'}`);
+  console.log(`Fal.ai API Key: ${process.env.FAL_KEY ? 'Loaded' : 'Missing'}`);
 });
